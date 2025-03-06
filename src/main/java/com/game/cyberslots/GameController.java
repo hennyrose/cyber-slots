@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api/game")
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true", allowedHeaders = "*")
 public class GameController {
     private final GameService gameService;
 

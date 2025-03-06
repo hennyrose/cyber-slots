@@ -9,8 +9,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("*")  // В продакшене замените на конкретный домен
-                .allowedMethods("GET", "POST")
+                .allowedOrigins("https://cyber-slots.onrender.com")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
                 .allowCredentials(true);
     }
 }

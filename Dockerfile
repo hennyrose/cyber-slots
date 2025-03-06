@@ -1,30 +1,46 @@
-# Использовать базовый образ Alpine Linux
-FROM alpine:3.21
-
-ARG version=21.0.6.7.1
-
-# Установка Amazon Corretto Java 21
-RUN wget -O /etc/apk/keys/amazoncorretto.rsa.pub https://apk.corretto.aws/amazoncorretto.rsa.pub && \
-    echo "https://apk.corretto.aws" >> /etc/apk/repositories && \
-    apk add --no-cache amazon-corretto-21=$version-r0 && \
-    rm -rf /usr/lib/jvm/java-21-amazon-corretto/lib/src.zip
-
-# Настройка переменных среды
-ENV LANG=C.UTF-8
-ENV JAVA_HOME=/usr/lib/jvm/default-jvm
-ENV PATH=$PATH:/usr/lib/jvm/default-jvm/bin
-
-# Рабочая директория
+# ------------------------------------------
+# 1) Сборка фронтенда (Vite + React)
+# ------------------------------------------
+FROM node:18 AS build-frontend
 WORKDIR /app
 
-# Копирование JAR файла
-COPY target/cyber-application.jar cyber-application.jar
+# Укажите здесь точную папку, где лежит package.json фронтенда:
+COPY cyber-slots-frontend/package*.json ./
+RUN npm install
 
-# Открываем порт 8080
+COPY cyber-slots-frontend/ ./
+RUN npm run build
+
+# ------------------------------------------
+# 2) Сборка бэкенда (Maven + Java)
+# ------------------------------------------
+FROM maven:3.9.4-eclipse-temurin-21 AS build-backend
+WORKDIR /app
+
+# Копируем pom.xml и прочие файлы для сборки приложения
+COPY pom.xml .
+# Опционально, если у вас есть какие-то дополнительные .xml, settings.xml и т.п.
+
+# Скачаем зависимости (кэшируем их в Docker):
+RUN mvn dependency:go-offline
+
+# Теперь копируем весь исходный код бэкенда:
+COPY src ./src
+
+# Копируем собранный фронтенд в папку static:
+COPY --from=build-frontend /app/dist ./src/main/resources/static
+
+# Собираем jar с пропуском тестов:
+RUN mvn clean package -DskipTests
+
+# ------------------------------------------
+# 3) Финальный образ (Amazon Correto)
+# ------------------------------------------
+FROM amazoncorretto:21-alpine
+WORKDIR /app
+
+# Копируем собранный jar
+COPY --from=build-backend /app/target/*.jar cyber-application.jar
+
 EXPOSE 8080
-
-# Команда запуска с дополнительными параметрами для отладки
-ENTRYPOINT ["java", "-jar", "cyber-application.jar", \
-            "-Dspring.profiles.active=prod", \
-            "-Dlogging.level.root=INFO", \
-            "-Dlogging.level.com.game.cyberslots=DEBUG"]
+ENTRYPOINT ["java", "-jar", "cyber-application.jar"]
