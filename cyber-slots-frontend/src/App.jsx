@@ -78,7 +78,7 @@ function App() {
         setBalanceChange(-bet);
 
         try {
-            const response = await fetch('https://cyber-slots.onrender.com/api/game/spin', {
+            const response = await fetch('http://localhost:8080/api/game/spin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ function App() {
         setError(null);
 
         try {
-            const response = await fetch('https://cyber-slots.onrender.com/api/game/bonus-spin', {
+            const response = await fetch('http://localhost:8080/api/game/bonus-spin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

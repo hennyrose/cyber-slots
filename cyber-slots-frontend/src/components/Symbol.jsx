@@ -1,5 +1,3 @@
-
-import React from 'react';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 
@@ -17,11 +15,6 @@ const SymbolContainer = styled(motion.div)`
     perspective: 1000px;
 `;
 
-/**
- * Тепер ми не використовуємо spinVariants,
- * бо анімація спіну відбувається в ReelColumn (SlotMachine.jsx).
- * Залишаємо тільки анімацію для виграшного символу («pulse»).
- */
 const SymbolContent = styled(motion.div)`
     display: flex;
     align-items: center;
@@ -39,17 +32,41 @@ const winVariants = {
             duration: 0.5,
             repeat: Infinity
         }
-    },
-    initial: { scale: 1 }
+    }
 };
 
-const Symbol = ({ icon, isWinning }) => {
+const spinVariants = {
+    initial: {
+        y: 0,
+        rotateX: 0,
+    },
+    spin: {
+        y: [-20, -200, 0],
+        rotateX: [0, 1440],
+        transition: {
+            duration: 1.5,
+            ease: "easeInOut",
+            y: {
+                type: "spring",
+                stiffness: 300
+            },
+            rotateX: {
+                type: "spring",
+                stiffness: 50,
+                damping: 15
+            }
+        }
+    }
+};
+
+const Symbol = ({ icon, isWinning, isSpinning, delay = 0 }) => {
     return (
         <SymbolContainer isWinning={isWinning}>
             <SymbolContent
                 initial="initial"
-                animate={isWinning ? 'pulse' : 'initial'}
-                variants={winVariants}
+                animate={isSpinning ? "spin" : (isWinning ? "pulse" : "initial")}
+                variants={isSpinning ? spinVariants : winVariants}
+                style={{ delay: delay }}
             >
                 {icon}
             </SymbolContent>
