@@ -1,59 +1,51 @@
-import React from 'react';
+// SlotMachine.jsx
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
+import ReelColumn from './ReelColumn.jsx';
 
-const SymbolContainer = styled(motion.div)`
-    font-size: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    background: ${props => props.isWinning ? 'rgba(0, 255, 159, 0.2)' : 'rgba(26, 26, 36, 0.5)'};
-    border-radius: 10px;
-    border: 2px solid ${props => props.isWinning ? props.theme.colors.primary : 'transparent'};
-    width: 70px;
-    height: 70px;
-    perspective: 1000px;
+// Стилі «машини» (тобто контейнера для трьох колонок)
+const Grid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 20px;
+    background: rgba(26, 26, 36, 0.9);
+    border-radius: 20px;
+    border: 3px solid ${props => props.theme.colors.primary};
+    box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+    width: 120vw;
+    max-width: 1200px;
+    margin: 0 auto;
 `;
 
-/**
- * Тепер ми не використовуємо spinVariants,
- * бо анімація спіну відбувається в ReelColumn (SlotMachine.jsx).
- * Залишаємо тільки анімацію для виграшного символу («pulse»).
- */
-const SymbolContent = styled(motion.div)`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    backface-visibility: visible;
-`;
+const SlotMachine = ({ grid, winningLine, isSpinning }) => {
+    const [finalGrid, setFinalGrid] = useState(grid);
 
-const winVariants = {
-    pulse: {
-        scale: [1, 1.2, 1],
-        transition: {
-            duration: 0.5,
-            repeat: Infinity
+    // Якщо змінилося «isSpinning» з true -> false,
+    // оновимо state, щоб компоненти ReelColumn показали «фінальні» символи
+    useEffect(() => {
+        if (!isSpinning) {
+            setFinalGrid(grid);
         }
-    },
-    initial: { scale: 1 }
-};
+    }, [isSpinning, grid]);
 
-const Symbol = ({ icon, isWinning }) => {
     return (
-        <SymbolContainer isWinning={isWinning}>
-            <SymbolContent
-                initial="initial"
-                animate={isWinning ? 'pulse' : 'initial'}
-                variants={winVariants}
-            >
-                {icon}
-            </SymbolContent>
-        </SymbolContainer>
+        <Grid>
+            {/**
+             * Кожна з трьох ReelColumn відображає один стовпець (colIndex),
+             * передаємо туди масив із 4 фінальних символів + ознаку виграшної лінії
+             */}
+            {[0, 1, 2].map((colIndex) => (
+                <ReelColumn
+                    key={`col-${colIndex}`}
+                    finalSymbols={finalGrid.map(row => row[colIndex])}
+                    isSpinning={isSpinning}
+                    winningLine={winningLine}
+                    colIndex={colIndex}
+                />
+            ))}
+        </Grid>
     );
 };
 
-export default Symbol;
+export default SlotMachine;
