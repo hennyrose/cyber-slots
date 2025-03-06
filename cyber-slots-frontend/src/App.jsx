@@ -7,6 +7,9 @@ import Controls from './components/Controls.jsx';
 import BonusModal from './components/BonusModal.jsx';
 import { theme } from './theme.js';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/game';
+
+
 const AppWrapper = styled.div`
     min-height: 100vh;
     display: flex;
@@ -78,7 +81,8 @@ function App() {
         setBalanceChange(-bet);
 
         try {
-            const response = await fetch('http://localhost:8080/api/game/spin', {
+            const response = await fetch(`${API_BASE_URL}/spin`
+                , {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -132,7 +136,8 @@ function App() {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:8080/api/game/bonus-spin', {
+            const response = await fetch(`${API_BASE_URL}/bonus-spin`
+                , {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

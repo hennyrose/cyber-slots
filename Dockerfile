@@ -17,6 +17,9 @@ ENV PATH=$PATH:/usr/lib/jvm/default-jvm/bin
 # Задаємо робочу директорію в контейнері
 WORKDIR /app
 
+ # Открываем порт 8080
+EXPOSE 8080
+
 # Копіюємо файл jar в контейнер
 COPY target/cyber-application.jar cyber-application.jar
 
