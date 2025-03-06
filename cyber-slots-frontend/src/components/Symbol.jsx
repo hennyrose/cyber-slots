@@ -1,4 +1,3 @@
-// Symbol.jsx
 import React from 'react';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
@@ -17,6 +16,11 @@ const SymbolContainer = styled(motion.div)`
     perspective: 1000px;
 `;
 
+/**
+ * Тепер ми не використовуємо spinVariants,
+ * бо анімація спіну відбувається в ReelColumn (SlotMachine.jsx).
+ * Залишаємо тільки анімацію для виграшного символу («pulse»).
+ */
 const SymbolContent = styled(motion.div)`
     display: flex;
     align-items: center;
