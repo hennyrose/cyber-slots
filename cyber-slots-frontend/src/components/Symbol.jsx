@@ -1,5 +1,17 @@
-import styled from '@emotion/styled';
+import styled, { keyframes } from '@emotion/styled';
 import { motion } from 'framer-motion';
+
+const glowingAnimation = keyframes`
+    0% {
+        box-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f, 0 0 15px #00ff9f;
+    }
+    50% {
+        box-shadow: 0 0 10px #00ff9f, 0 0 20px #00ff9f, 0 0 30px #00ff9f;
+    }
+    100% {
+        box-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f, 0 0 15px #00ff9f;
+    }
+`;
 
 const SymbolContainer = styled(motion.div)`
     font-size: 42px;
@@ -13,6 +25,7 @@ const SymbolContainer = styled(motion.div)`
     width: 70px;
     height: 70px;
     perspective: 1000px;
+    animation: ${props => props.isWinning ? glowingAnimation : 'none'} 1.5s ease-in-out infinite;
 
     @media (max-width: 768px) {
         width: 50px;
@@ -22,62 +35,16 @@ const SymbolContainer = styled(motion.div)`
     }
 `;
 
-
-const SymbolContent = styled(motion.div)`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    backface-visibility: visible;
-`;
-
-const winVariants = {
-    pulse: {
-        scale: [1, 1.2, 1],
-        transition: {
-            duration: 0.5,
-            repeat: Infinity
-        }
-    }
-};
-
-const spinVariants = {
-    initial: {
-        y: 0,
-        rotateX: 0,
-    },
-    spin: {
-        y: [-20, -200, 0],
-        rotateX: [0, 1440],
-        transition: {
-            duration: 1.5,
-            ease: "easeInOut",
-            y: {
-                type: "spring",
-                stiffness: 300
-            },
-            rotateX: {
-                type: "spring",
-                stiffness: 50,
-                damping: 15
-            }
-        }
-    }
-};
-
 const Symbol = ({ icon, isWinning, isSpinning, delay }) => {
-    // Convert text symbols to emoji on mobile
-    const getSymbolIcon = () => {
+    const getSymbolIcon = (icon) => {
         if (window.innerWidth <= 768) {
             switch(icon) {
-                case 'CP': return '🤖';
-                case 'N': return '💡';
-                case 'CH': return '💾';
-                case 'M': return '🌐';
-                case 'L': return '⚡';
-                case 'H': return '👾';
+                case 'CYBER_PUNK': return '🤖';
+                case 'NEON': return '💡';
+                case 'CHIP': return '💾';
+                case 'MATRIX': return '🌐';
+                case 'LASER': return '⚡';
+                case 'HOLOGRAM': return '👾';
                 default: return icon;
             }
         }
@@ -105,10 +72,11 @@ const Symbol = ({ icon, isWinning, isSpinning, delay }) => {
             animate={isSpinning ? "spinning" : "static"}
             variants={variants}
         >
-            {getSymbolIcon()}
+            {getSymbolIcon(icon)}
         </SymbolContainer>
     );
 };
+
 
 
 export default Symbol;
