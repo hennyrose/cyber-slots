@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 
@@ -7,9 +8,8 @@ const SymbolContainer = styled(motion.div)`
     align-items: center;
     justify-content: center;
     padding: 8px;
-    background: ${props => props.isWinning ? 'rgba(0, 255, 159, 0.2)' : 'rgba(26, 26, 36, 0.5)'};
+    background: rgba(26, 26, 36, 0.5);
     border-radius: 10px;
-    border: 2px solid ${props => props.isWinning ? props.theme.colors.primary : 'transparent'};
     width: 70px;
     height: 70px;
     perspective: 1000px;
@@ -22,7 +22,6 @@ const SymbolContainer = styled(motion.div)`
     }
 `;
 
-
 const SymbolContent = styled(motion.div)`
     display: flex;
     align-items: center;
@@ -32,16 +31,6 @@ const SymbolContent = styled(motion.div)`
     transform-style: preserve-3d;
     backface-visibility: visible;
 `;
-
-const winVariants = {
-    pulse: {
-        scale: [1, 1.2, 1],
-        transition: {
-            duration: 0.5,
-            repeat: Infinity
-        }
-    }
-};
 
 const spinVariants = {
     initial: {
@@ -67,48 +56,52 @@ const spinVariants = {
     }
 };
 
-const Symbol = ({ icon, isWinning, isSpinning, delay }) => {
-    // Convert text symbols to emoji on mobile
+const Symbol = ({ icon, isSpinning, delay }) => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const getSymbolIcon = () => {
-        if (window.innerWidth <= 768) {
+        if (isMobile) {
             switch(icon) {
-                case 'CP': return '🤖';
-                case 'N': return '💡';
-                case 'CH': return '💾';
-                case 'M': return '🌐';
-                case 'L': return '⚡';
-                case 'H': return '👾';
+                case 'CYBER_PUNK': return '🤖';
+                case 'NEON': return '💡';
+                case 'CHIP': return '💾';
+                case 'MATRIX': return '🌐';
+                case 'LASER': return '⚡';
+                case 'HOLOGRAM': return '👾';
                 default: return icon;
             }
         }
         return icon;
     };
 
-    const variants = {
-        spinning: {
-            rotateX: [0, 360],
-            transition: {
-                duration: 1,
-                delay,
-                ease: "easeInOut",
-                repeat: Infinity,
-            }
-        },
-        static: {
-            rotateX: 0
-        }
-    };
-
     return (
         <SymbolContainer
-            isWinning={isWinning}
-            animate={isSpinning ? "spinning" : "static"}
-            variants={variants}
+            animate={isSpinning ? "spin" : "initial"}
+            variants={spinVariants}
         >
-            {getSymbolIcon()}
+            <SymbolContent
+                initial={false}
+                animate={isSpinning ? { rotateX: [0, 360] } : { rotateX: 0 }}
+                transition={{
+                    duration: 1,
+                    delay,
+                    ease: "easeInOut",
+                    repeat: isSpinning ? Infinity : 0
+                }}
+            >
+                {getSymbolIcon()}
+            </SymbolContent>
         </SymbolContainer>
     );
 };
-
 
 export default Symbol;
