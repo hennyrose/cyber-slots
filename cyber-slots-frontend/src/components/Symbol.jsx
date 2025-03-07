@@ -1,8 +1,5 @@
-// Symbol.jsx
-import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
-
 
 const SymbolContainer = styled(motion.div)`
     font-size: 42px;
@@ -17,20 +14,6 @@ const SymbolContainer = styled(motion.div)`
     height: 70px;
     perspective: 1000px;
 
-    animation: ${props => props.isWinning ? 'glow 1.5s ease-in-out infinite' : 'none'};
-
-    @keyframes glow {
-        0% {
-            box-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f, 0 0 15px #00ff9f;
-        }
-        50% {
-            box-shadow: 0 0 10px #00ff9f, 0 0 20px #00ff9f, 0 0 30px #00ff9f;
-        }
-        100% {
-            box-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f, 0 0 15px #00ff9f;
-        }
-    }
-
     @media (max-width: 768px) {
         width: 50px;
         height: 50px;
@@ -39,53 +22,93 @@ const SymbolContainer = styled(motion.div)`
     }
 `;
 
+
+const SymbolContent = styled(motion.div)`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    backface-visibility: visible;
+`;
+
+const winVariants = {
+    pulse: {
+        scale: [1, 1.2, 1],
+        transition: {
+            duration: 0.5,
+            repeat: Infinity
+        }
+    }
+};
+
+const spinVariants = {
+    initial: {
+        y: 0,
+        rotateX: 0,
+    },
+    spin: {
+        y: [-20, -200, 0],
+        rotateX: [0, 1440],
+        transition: {
+            duration: 1.5,
+            ease: "easeInOut",
+            y: {
+                type: "spring",
+                stiffness: 300
+            },
+            rotateX: {
+                type: "spring",
+                stiffness: 50,
+                damping: 15
+            }
+        }
+    }
+};
+
 const Symbol = ({ icon, isWinning, isSpinning, delay }) => {
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
+    // Convert text symbols to emoji on mobile
     const getSymbolIcon = () => {
-        if (isMobile) {
+        if (window.innerWidth <= 768) {
             switch(icon) {
-                case 'CYBER_PUNK': return '🤖';
-                case 'NEON': return '💡';
-                case 'CHIP': return '💾';
-                case 'MATRIX': return '🌐';
-                case 'LASER': return '⚡';
-                case 'HOLOGRAM': return '👾';
+                case 'CP': return '🤖';
+                case 'N': return '💡';
+                case 'CH': return '💾';
+                case 'M': return '🌐';
+                case 'L': return '⚡';
+                case 'H': return '👾';
                 default: return icon;
             }
         }
         return icon;
     };
 
+    const variants = {
+        spinning: {
+            rotateX: [0, 360],
+            transition: {
+                duration: 1,
+                delay,
+                ease: "easeInOut",
+                repeat: Infinity,
+            }
+        },
+        static: {
+            rotateX: 0
+        }
+    };
+
     return (
         <SymbolContainer
             isWinning={isWinning}
-            animate={isSpinning ? "spin" : isWinning ? "pulse" : "initial"}
-            variants={isSpinning ? spinVariants : winVariants}
+            animate={isSpinning ? "spinning" : "static"}
+            variants={variants}
         >
-            <SymbolContent
-                initial={false}
-                animate={isSpinning ? { rotateX: [0, 360] } : { rotateX: 0 }}
-                transition={{
-                    duration: 1,
-                    delay,
-                    ease: "easeInOut",
-                    repeat: isSpinning ? Infinity : 0
-                }}
-            >
-                {getSymbolIcon()}
-            </SymbolContent>
+            {getSymbolIcon()}
         </SymbolContainer>
     );
 };
+
 
 export default Symbol;
