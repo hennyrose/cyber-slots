@@ -30,56 +30,37 @@ const Modal = styled(motion.div)`
     }
 `;
 
+const TestRibbon = styled.div`
+    position: absolute;
+    top: 10px;
+    right: -10px;
+    background: #ff4444;
+    color: white;
+    padding: 5px 15px;
+    transform: rotate(45deg);
+    font-size: 0.8rem;
+    z-index: 1;
+`;
+
+
 const BonusOption = styled.div`
     margin: 1rem 0;
     padding: 1.5rem;
     border: 1px solid ${props => props.theme.colors.primary};
     border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
     position: relative;
     background: rgba(0, 0, 0, 0.2);
-
-    h3 {
-        color: ${props => props.theme.colors.primary};
-        margin-bottom: 0.5rem;
-        font-family: 'Orbitron', sans-serif;
-    }
-
-    p {
-        color: ${props => props.theme.colors.text};
-        margin: 0.5rem 0;
-        font-size: 0.9rem;
-    }
+    opacity: 0.7;
+    cursor: not-allowed;
+    overflow: hidden;
 
     &:hover {
-        background: rgba(0, 255, 159, 0.1);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 255, 159, 0.2);
-    }
-
-    &:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(0, 255, 159, 0.1);
-    }
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 0.5rem;
-        border: 1px solid transparent;
-        transition: all 0.3s ease;
-    }
-
-    &:hover::before {
-        border-color: ${props => props.theme.colors.primary};
-        transform: scale(1.02);
+        background: rgba(0, 0, 0, 0.2);
+        transform: none;
+        box-shadow: none;
     }
 `;
+
 
 const BonusPrice = styled.div`
     color: ${props => props.theme.colors.primary};
@@ -146,10 +127,8 @@ const BonusModal = ({ isOpen, onClose, onSelectBonus, bet }) => {
                     >
                         <h2>Select Bonus Mode</h2>
                         {bonusOptions.map(option => (
-                            <BonusOption
-                                key={option.id}
-                                onClick={() => onSelectBonus(option)}
-                            >
+                            <BonusOption key={option.id}>
+                                <TestRibbon>Testing</TestRibbon>
                                 <h3>{option.name}</h3>
                                 <p>{option.description}</p>
                                 <BonusDetails>

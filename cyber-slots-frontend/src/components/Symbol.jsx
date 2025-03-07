@@ -13,7 +13,15 @@ const SymbolContainer = styled(motion.div)`
     width: 70px;
     height: 70px;
     perspective: 1000px;
+
+    @media (max-width: 768px) {
+        width: 50px;
+        height: 50px;
+        font-size: 32px;
+        padding: 4px;
+    }
 `;
+
 
 const SymbolContent = styled(motion.div)`
     display: flex;

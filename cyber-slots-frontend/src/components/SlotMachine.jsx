@@ -11,10 +11,17 @@ const Grid = styled.div`
     border-radius: 20px;
     border: 3px solid ${props => props.theme.colors.primary};
     box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
-    width: 120vw;
+    width: 90vw;
     max-width: 1200px;
     margin: 0 auto;
+
+    @media (max-width: 768px) {
+        width: 95vw;
+        padding: 10px;
+        gap: 4px;
+    }
 `;
+
 
 
 const Column = styled.div`

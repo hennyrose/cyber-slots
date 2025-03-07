@@ -7,6 +7,9 @@ import Controls from './components/Controls.jsx';
 import BonusModal from './components/BonusModal.jsx';
 import { theme } from './theme.js';
 import axios from 'axios';
+import InfoButton from './components/InfoButton';
+
+
 
 const AppWrapper = styled.div`
     min-height: 100vh;
@@ -230,6 +233,7 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <AppWrapper>
+                <InfoButton />
                 <div style={{
                     position: 'absolute',
                     top: '20px',
