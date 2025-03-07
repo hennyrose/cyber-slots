@@ -46,12 +46,12 @@ const InfoButton = () => {
                         exit={{ opacity: 0, y: -20 }}
                     >
                         <h3>Виграшні комбінації:</h3>
-                        <p>🤖🤖🤖 - x5 ставки</p>
-                        <p>💾💾💾 - x4 ставки</p>
-                        <p>💡💡💡 - x3 ставки</p>
-                        <p>⚡⚡⚡ - x3 ставки</p>
-                        <p>🌐🌐🌐 - x2 ставки</p>
-                        <p>👾👾👾 - x2 ставки</p>
+                        <p>CYBER_PUNK🤖🤖🤖 - x5</p>
+                        <p>CHIP💾💾💾 - x4</p>
+                        <p>NEON💡💡💡 - x3</p>
+                        <p>LASER⚡⚡⚡ - x3</p>
+                        <p>MATRIX🌐🌐🌐 - x2</p>
+                        <p>HOLOGRAM👾👾👾 - x2</p>
                     </InfoPopup>
                 )}
             </AnimatePresence>
