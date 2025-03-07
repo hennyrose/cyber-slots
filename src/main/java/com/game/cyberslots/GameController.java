@@ -12,8 +12,11 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GameController {
     private final GameService gameService;
 
-    public GameController(GameService gameService) {
+    private final NeonRushBonusService neonRushBonusService;
+
+    public GameController(GameService gameService, NeonRushBonusService neonRushBonusService) {
         this.gameService = gameService;
+        this.neonRushBonusService = neonRushBonusService;
     }
 
     @PostMapping("/spin")
@@ -24,6 +27,11 @@ public class GameController {
     @PostMapping("/bonus-spin")
     public GameResult bonusSpin(@RequestBody BonusSpinRequest request, HttpSession session) {
         return gameService.buyBonus(session.getId(), request);
+    }
+
+    @PostMapping("/neon-rush-bonus")
+    public NeonRushBonusResult neonRushBonus(@RequestBody BonusSpinRequest request, HttpSession session) {
+        return neonRushBonusService.generateNeonRushBonus();
     }
 
     @PostMapping("/restart")
