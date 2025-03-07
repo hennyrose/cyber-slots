@@ -55,8 +55,9 @@ const Button = styled.button`
     transition: all 0.3s ease;
 
     @media (max-width: 768px) {
-        padding: 8px 16px;
-        font-size: 16px;
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 6px;
     }
 
     &:disabled {
@@ -290,7 +291,7 @@ function App() {
                     gap: '10px'
                 }}>
                    <span style={{ color: theme.colors.text }}>
-    Session ID: {sessionId}
+    Session: {sessionId}
 </span>
                     <button
                         onClick={handleRestart}

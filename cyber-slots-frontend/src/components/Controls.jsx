@@ -2,9 +2,15 @@ import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 
 const ControlsWrapper = styled.div`
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+
+    @media (max-width: 768px) {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 `;
 
 const Button = styled(motion.button)`
@@ -31,15 +37,29 @@ const Button = styled(motion.button)`
         transform: none;
         box-shadow: none;
     }
+
+    @media (max-width: 768px) {
+        padding: 8px 15px;
+        font-size: 14px;
+        min-width: 60px;
+        border-width: 1px;
+    }
 `;
 
 const BetAmount = styled.div`
-  font-size: 24px;
-  color: ${props => props.theme.colors.primary};
-  margin: 0 20px;
-  min-width: 100px;
-  text-align: center;
+    font-size: 24px;
+    color: ${props => props.theme.colors.primary};
+    margin: 0 20px;
+    min-width: 100px;
+    text-align: center;
+
+    @media (max-width: 768px) {
+        font-size: 16px;
+        margin: 0 10px;
+        min-width: 60px;
+    }
 `;
+
 
 // Додайте нову кнопку в Controls.jsx
 const Controls = ({ onSpin, onIncreaseBet, onDecreaseBet, bet, isSpinning, onBuyBonus }) => (

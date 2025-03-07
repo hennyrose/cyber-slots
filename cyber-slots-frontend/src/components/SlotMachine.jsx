@@ -27,16 +27,17 @@ const WinningRow = styled(motion.div)`
     position: absolute;
     left: 0;
     right: 0;
-    height: 86px; // Adjust based on your symbol height + gap
+    height: 40px; // Reduced from 86px
     background: rgba(0, 255, 159, 0.2);
     border-radius: 10px;
     z-index: 1;
     pointer-events: none;
 
     @media (max-width: 768px) {
-        height: 58px; // Adjust for mobile
+        height: 28px; // Reduced from 58px
     }
 `;
+
 
 const Column = styled.div`
     display: flex;
