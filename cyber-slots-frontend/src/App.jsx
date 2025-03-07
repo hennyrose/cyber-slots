@@ -33,10 +33,10 @@ const ControlsContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin: 20px auto;
+    margin-top: 20px;
     width: 90vw;
     max-width: 1200px;
-    align-items: center;
+    margin: 20px auto;
 
     @media (max-width: 768px) {
         width: 95vw;
@@ -53,15 +53,10 @@ const Button = styled.button`
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    width: fit-content;
-    min-width: 120px;
-    max-width: 200px;
 
     @media (max-width: 768px) {
         padding: 8px 16px;
-        font-size: 14px;
-        min-width: 100px;
-        max-width: 150px;
+        font-size: 16px;
     }
 
     &:disabled {
@@ -71,17 +66,14 @@ const Button = styled.button`
 `;
 
 const SessionInfo = styled.div`
-    font-size: 14px;
+    font-size: 16px;
     color: ${props => props.theme.colors.text};
-    opacity: 0.8;
     margin-top: 10px;
 
     @media (max-width: 768px) {
-        font-size: 10px;
-        opacity: 0.6;
+        font-size: 12px;
     }
 `;
-
 
 
 const Balance = styled.div`
@@ -325,15 +317,6 @@ function App() {
                     winningLine={winningLine}
                     isSpinning={isSpinning}
                 />
-                <ControlsContainer>
-                    <Button onClick={handleSpin} disabled={isSpinning}>
-                        Крутити
-                    </Button>
-                    <SessionInfo>
-                        ID: {sessionId.substring(0, 8)}...
-                    </SessionInfo>
-                </ControlsContainer>
-
                 <Controls
                     onSpin={handleSpin}
                     onIncreaseBet={handleIncreaseBet}
