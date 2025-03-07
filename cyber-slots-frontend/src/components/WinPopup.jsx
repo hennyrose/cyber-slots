@@ -21,13 +21,25 @@ const PopupContent = styled(motion.div)`
     border: 2px solid ${props => props.theme.colors.success};
     box-shadow: ${props => props.theme.shadows.success};
     text-align: center;
+
+    @media (max-width: 768px) {
+        padding: 1.5rem;
+        width: 80%;
+    }
 `;
+
 
 const WinAmount = styled.h2`
     color: ${props => props.theme.colors.success};
     font-size: 2rem;
     margin-bottom: 1rem;
+
+    @media (max-width: 768px) {
+        font-size: 1.5rem;
+    }
 `;
+
+
 
 const WinPopup = ({ win, isVisible, onClose }) => (
     <AnimatePresence>

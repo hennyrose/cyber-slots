@@ -29,6 +29,53 @@ const Title = styled.h1`
     margin-bottom: 30px;
 `;
 
+const ControlsContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    width: 90vw;
+    max-width: 1200px;
+    margin: 20px auto;
+
+    @media (max-width: 768px) {
+        width: 95vw;
+        gap: 10px;
+    }
+`;
+
+const Button = styled.button`
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 10px;
+    background: ${props => props.theme.colors.primary};
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    @media (max-width: 768px) {
+        padding: 8px 16px;
+        font-size: 16px;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+`;
+
+const SessionInfo = styled.div`
+    font-size: 16px;
+    color: ${props => props.theme.colors.text};
+    margin-top: 10px;
+
+    @media (max-width: 768px) {
+        font-size: 12px;
+    }
+`;
+
+
 const Balance = styled.div`
     font-size: 24px;
     color: ${props => props.theme.colors.primary};

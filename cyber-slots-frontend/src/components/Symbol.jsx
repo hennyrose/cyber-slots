@@ -67,19 +67,48 @@ const spinVariants = {
     }
 };
 
-const Symbol = ({ icon, isWinning, isSpinning, delay = 0 }) => {
+const Symbol = ({ icon, isWinning, isSpinning, delay }) => {
+    // Convert text symbols to emoji on mobile
+    const getSymbolIcon = () => {
+        if (window.innerWidth <= 768) {
+            switch(icon) {
+                case 'CP': return '🤖';
+                case 'N': return '💡';
+                case 'CH': return '💾';
+                case 'M': return '🌐';
+                case 'L': return '⚡';
+                case 'H': return '👾';
+                default: return icon;
+            }
+        }
+        return icon;
+    };
+
+    const variants = {
+        spinning: {
+            rotateX: [0, 360],
+            transition: {
+                duration: 1,
+                delay,
+                ease: "easeInOut",
+                repeat: Infinity,
+            }
+        },
+        static: {
+            rotateX: 0
+        }
+    };
+
     return (
-        <SymbolContainer isWinning={isWinning}>
-            <SymbolContent
-                initial="initial"
-                animate={isSpinning ? "spin" : (isWinning ? "pulse" : "initial")}
-                variants={isSpinning ? spinVariants : winVariants}
-                style={{ delay: delay }}
-            >
-                {icon}
-            </SymbolContent>
+        <SymbolContainer
+            isWinning={isWinning}
+            animate={isSpinning ? "spinning" : "static"}
+            variants={variants}
+        >
+            {getSymbolIcon()}
         </SymbolContainer>
     );
 };
+
 
 export default Symbol;
