@@ -2,6 +2,7 @@ package com.game.cyberslots;
 
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/game")
@@ -25,9 +26,22 @@ public class GameController {
         return gameService.buyBonus(session.getId(), request);
     }
 
+    @PostMapping("/restart")
+    public int restartDemo(HttpServletRequest request) {
+        // Invalidate current session
+        HttpSession currentSession = request.getSession(false);
+        if (currentSession != null) {
+            currentSession.invalidate();
+        }
+
+        // Create new session
+        HttpSession newSession = request.getSession(true);
+        return gameService.initializeBalance(newSession.getId());
+    }
+
 
     @GetMapping("/balance")
     public int getBalance(HttpSession session) {
-        return 8000; // Початковий баланс
+        return gameService.getBalance(session.getId());
     }
 }

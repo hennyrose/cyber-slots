@@ -6,6 +6,7 @@ import SlotMachine from './components/SlotMachine.jsx';
 import Controls from './components/Controls.jsx';
 import BonusModal from './components/BonusModal.jsx';
 import { theme } from './theme.js';
+import axios from 'axios';
 
 const AppWrapper = styled.div`
     min-height: 100vh;
@@ -68,6 +69,33 @@ function App() {
     const [error, setError] = useState(null);
     const [balanceChange, setBalanceChange] = useState(null);
     const [isBonusModalOpen, setIsBonusModalOpen] = useState(false);
+    const [sessionId, setSessionId] = useState(generateSessionId());
+
+    function generateSessionId() {
+        // Генеруємо ID без префіксу session_
+        return Math.random().toString(36).substr(2, 9);
+    }
+
+
+    useEffect(() => {
+        fetchBalance();
+    }, []);
+
+    const fetchBalance = async () => {
+        try {
+            const response = await fetch('https://cyber-slots.onrender.com/api/game/balance', {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch balance');
+            const balance = await response.json();
+            setBalance(balance);
+
+            document.cookie = `JSESSIONID=${sessionId}; path=/`;
+        } catch (error) {
+            console.error('Error fetching balance:', error);
+            setError('Failed to load balance');
+        }
+    };
 
     const handleSpin = async () => {
         if (isSpinning || balance < bet) return;
@@ -78,7 +106,7 @@ function App() {
         setBalanceChange(-bet);
 
         try {
-            const response = await fetch('http://localhost:8080/api/game/spin', {
+            const response = await fetch('https://cyber-slots.onrender.com/api/game/spin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -132,7 +160,7 @@ function App() {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:8080/api/game/bonus-spin', {
+            const response = await fetch('https://cyber-slots.onrender.com/api/game/bonus-spin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,7 +182,6 @@ function App() {
 
             if (result.winningGame) {
                 setBalanceChange(result.winAmount);
-                // Обробка виграшної лінії...
             }
         } catch (error) {
             console.error('Error during bonus spin:', error);
@@ -173,9 +200,61 @@ function App() {
         if (bet > 1) setBet(prev => prev - 1);
     };
 
+    const handleRestart = async () => {
+        try {
+            const response = await fetch('https://cyber-slots.onrender.com/api/game/restart', {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to restart game');
+            }
+
+            // Оновлюємо баланс
+            await fetchBalance();
+
+            // Скидаємо стан гри
+            setGrid(Array(4).fill(Array(3).fill('')));
+            setWinningLine(null);
+            setError(null);
+            setBalanceChange(null);
+            setIsSpinning(false);
+
+        } catch (error) {
+            console.error('Error restarting game:', error);
+            setError('Failed to restart game');
+        }
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <AppWrapper>
+                <div style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                }}>
+                   <span style={{ color: theme.colors.text }}>
+    Session ID: {sessionId}
+</span>
+                    <button
+                        onClick={handleRestart}
+                        style={{
+                            padding: '8px 16px',
+                            backgroundColor: theme.colors.primary,
+                            color: theme.colors.text,
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Restart Demo
+                    </button>
+                </div>
                 <Title>Cyber Slots</Title>
                 <Balance>
                     Balance: {balance}€

@@ -33,6 +33,16 @@ public class GameService {
         return result;
     }
 
+    public int initializeBalance(String sessionId) {
+        // Reset/create new balance for the session
+        playerBalance.put(sessionId, 8000);
+        return 8000;
+    }
+
+    public int getBalance(String sessionId) {
+        return playerBalance.getOrDefault(sessionId, 8000);
+    }
+
     private Symbol[][] generateGrid() {
         Symbol[][] grid = new Symbol[4][3];
         for (int i = 0; i < 4; i++) {
