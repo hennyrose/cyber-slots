@@ -45,7 +45,7 @@ const InfoButton = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                     >
-                        <h3>Виграшні комбінації:</h3>
+                        <h3>Combinations:</h3>
                         <p>CYBER_PUNK🤖🤖🤖 - x5</p>
                         <p>CHIP💾💾💾 - x4</p>
                         <p>NEON💡💡💡 - x3</p>
