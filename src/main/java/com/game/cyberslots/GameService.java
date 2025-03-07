@@ -117,12 +117,37 @@ public class GameService {
         }
     }
 
-    // Існуючі приватні методи залишаються без змін
     private Symbol[][] generateGrid() {
         Symbol[][] grid = new Symbol[4][3];
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
                 grid[i][j] = Symbol.values()[random.nextInt(Symbol.values().length)];
+            }
+        }
+        return grid;
+    }
+
+    private Symbol[][] generateBonusGrid(String bonusType) {
+        if ("neon-rush".equals(bonusType)) {
+            return generateNeonRushGrid();
+        }
+        return generateGrid(); // Default grid for other bonus types
+    }
+
+    private Symbol[][] generateNeonRushGrid() {
+        Symbol[][] grid = new Symbol[4][3];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                // Increased probability for CYBER_PUNK and CHIP
+                int rand = random.nextInt(100);
+                if (rand < 30) { // 30% chance for CYBER_PUNK
+                    grid[i][j] = Symbol.CYBER_PUNK;
+                } else if (rand < 55) { // 25% chance for CHIP
+                    grid[i][j] = Symbol.CHIP;
+                } else { // 45% chance for other symbols
+                    Symbol[] otherSymbols = {Symbol.NEON, Symbol.MATRIX, Symbol.LASER, Symbol.HOLOGRAM};
+                    grid[i][j] = otherSymbols[random.nextInt(otherSymbols.length)];
+                }
             }
         }
         return grid;
@@ -154,11 +179,18 @@ public class GameService {
         };
     }
 
-    private Symbol[][] generateBonusGrid(String bonusType) {
-        return generateGrid();
-    }
-
     private int calculateBonusWin(Symbol[][] grid, int bet, String bonusType) {
+        if ("neon-rush".equals(bonusType)) {
+            int totalWin = 0;
+            // Run 5 free spins
+            for (int spin = 0; spin < 5; spin++) {
+                Symbol[][] spinGrid = generateNeonRushGrid();
+                if (checkWin(spinGrid)) {
+                    totalWin += calculateWin(spinGrid, bet);
+                }
+            }
+            return totalWin;
+        }
         return calculateWin(grid, bet);
     }
 }
