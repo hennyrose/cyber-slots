@@ -1,46 +1,43 @@
 # ------------------------------------------
-# 1) Сборка фронтенда (Vite + React)
+# 1) Frontend Build Stage
 # ------------------------------------------
 FROM node:18 AS build-frontend
 WORKDIR /app
 
-# Укажите здесь точную папку, где лежит package.json фронтенда:
-COPY cyber-slots-frontend/package*.json ./
+# Copy frontend package files
+COPY package*.json ./
 RUN npm install
 
-COPY cyber-slots-frontend/ ./
+# Copy frontend source
+COPY . ./
 RUN npm run build
 
 # ------------------------------------------
-# 2) Сборка бэкенда (Maven + Java)
+# 2) Backend Build Stage
 # ------------------------------------------
 FROM maven:3.9.4-eclipse-temurin-21 AS build-backend
 WORKDIR /app
 
-# Копируем pom.xml и прочие файлы для сборки приложения
-COPY pom.xml .
-# Опционально, если у вас есть какие-то дополнительные .xml, settings.xml и т.п.
-
-# Скачаем зависимости (кэшируем их в Docker):
-RUN mvn dependency:go-offline
-
-# Теперь копируем весь исходный код бэкенда:
-COPY src ./src
-
-# Копируем собранный фронтенд в папку static:
+# Copy backend files
+COPY . .
+# Copy frontend build to static resources
 COPY --from=build-frontend /app/dist ./src/main/resources/static
 
-# Собираем jar с пропуском тестов:
+# Build the application
 RUN mvn clean package -DskipTests
 
 # ------------------------------------------
-# 3) Финальный образ (Amazon Correto)
+# 3) Final Stage
 # ------------------------------------------
 FROM amazoncorretto:21-alpine
 WORKDIR /app
 
-# Копируем собранный jar
-COPY --from=build-backend /app/target/*.jar cyber-application.jar
+# Copy the built JAR
+COPY --from=build-backend /app/target/*.jar app.jar
 
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "cyber-application.jar"]
+# Set environment variables
+ENV PORT=8080
+EXPOSE ${PORT}
+
+# Run the application
+CMD ["java", "-jar", "app.jar"]
