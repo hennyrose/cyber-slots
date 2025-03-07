@@ -1,48 +1,123 @@
 package com.game.cyberslots;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.Duration;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
     private final Random random = new Random();
-    private final ConcurrentHashMap<String, Integer> playerBalance = new ConcurrentHashMap<>();
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String BALANCE_KEY_PREFIX = "player:balance:";
+    private static final String LOCK_KEY_PREFIX = "player:lock:";
+    private static final int INITIAL_BALANCE = 8000;
+    private static final Duration LOCK_DURATION = Duration.ofSeconds(5);
 
+    public GameService(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Transactional
     public GameResult spin(String sessionId, int bet) {
-        playerBalance.putIfAbsent(sessionId, 8000);
-        int balance = playerBalance.get(sessionId);
+        String lockKey = LOCK_KEY_PREFIX + sessionId;
+        boolean locked = redisTemplate.opsForValue()
+                .setIfAbsent(lockKey, "locked", LOCK_DURATION);
 
-        if (balance < bet) {
-            throw new IllegalStateException("Insufficient balance");
+        if (!locked) {
+            throw new IllegalStateException("Another game is in progress");
         }
 
-        Symbol[][] grid = generateGrid();
-        boolean isWin = checkWin(grid);
-        int winAmount = isWin ? calculateWin(grid, bet) : 0;
+        try {
+            String balanceKey = BALANCE_KEY_PREFIX + sessionId;
+            Integer balance = (Integer) redisTemplate.opsForValue().get(balanceKey);
+            if (balance == null) {
+                balance = INITIAL_BALANCE;
+                redisTemplate.opsForValue().set(balanceKey, balance);
+            }
 
-        int newBalance = balance - bet + winAmount;
-        playerBalance.put(sessionId, newBalance);
+            if (balance < bet) {
+                throw new IllegalStateException("Insufficient balance");
+            }
 
-        GameResult result = new GameResult();
-        result.setGrid(grid);
-        result.setWinAmount(winAmount);
-        result.setNewBalance(newBalance);
-        result.setWinningGame(isWin);
+            Symbol[][] grid = generateGrid();
+            boolean isWin = checkWin(grid);
+            int winAmount = isWin ? calculateWin(grid, bet) : 0;
 
-        return result;
+            int newBalance = balance - bet + winAmount;
+            redisTemplate.opsForValue().set(balanceKey, newBalance);
+
+            GameResult result = new GameResult();
+            result.setGrid(grid);
+            result.setWinAmount(winAmount);
+            result.setNewBalance(newBalance);
+            result.setWinningGame(isWin);
+
+            return result;
+        } finally {
+            redisTemplate.delete(lockKey);
+        }
     }
 
+    @Transactional
     public int initializeBalance(String sessionId) {
-        // Reset/create new balance for the session
-        playerBalance.put(sessionId, 8000);
-        return 8000;
+        String balanceKey = BALANCE_KEY_PREFIX + sessionId;
+        redisTemplate.opsForValue().set(balanceKey, INITIAL_BALANCE);
+        return INITIAL_BALANCE;
     }
 
+    @Transactional
     public int getBalance(String sessionId) {
-        return playerBalance.getOrDefault(sessionId, 8000);
+        String balanceKey = BALANCE_KEY_PREFIX + sessionId;
+        Integer balance = (Integer) redisTemplate.opsForValue().get(balanceKey);
+        return balance != null ? balance : INITIAL_BALANCE;
     }
 
+    @Transactional
+    public GameResult buyBonus(String sessionId, BonusSpinRequest request) {
+        String lockKey = LOCK_KEY_PREFIX + sessionId;
+        boolean locked = redisTemplate.opsForValue()
+                .setIfAbsent(lockKey, "locked", LOCK_DURATION);
+
+        if (!locked) {
+            throw new IllegalStateException("Another game is in progress");
+        }
+
+        try {
+            String balanceKey = BALANCE_KEY_PREFIX + sessionId;
+            Integer balance = (Integer) redisTemplate.opsForValue().get(balanceKey);
+            if (balance == null) {
+                balance = INITIAL_BALANCE;
+                redisTemplate.opsForValue().set(balanceKey, balance);
+            }
+
+            int bonusPrice = calculateBonusPrice(request.getBet(), request.getBonusType());
+
+            if (balance < bonusPrice) {
+                throw new IllegalStateException("Insufficient balance for bonus");
+            }
+
+            Symbol[][] grid = generateBonusGrid(request.getBonusType());
+            boolean isWin = checkWin(grid);
+            int winAmount = calculateBonusWin(grid, request.getBet(), request.getBonusType());
+
+            int newBalance = balance - bonusPrice + winAmount;
+            redisTemplate.opsForValue().set(balanceKey, newBalance);
+
+            GameResult result = new GameResult();
+            result.setGrid(grid);
+            result.setWinAmount(winAmount);
+            result.setNewBalance(newBalance);
+            result.setWinningGame(isWin);
+
+            return result;
+        } finally {
+            redisTemplate.delete(lockKey);
+        }
+    }
+
+    // Існуючі приватні методи залишаються без змін
     private Symbol[][] generateGrid() {
         Symbol[][] grid = new Symbol[4][3];
         for (int i = 0; i < 4; i++) {
@@ -54,7 +129,6 @@ public class GameService {
     }
 
     private boolean checkWin(Symbol[][] grid) {
-        // Перевірка горизонтальних ліній
         for (int i = 0; i < 4; i++) {
             if (grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2]) {
                 return true;
@@ -72,30 +146,6 @@ public class GameService {
         return 0;
     }
 
-    public GameResult buyBonus(String sessionId, BonusSpinRequest request) {
-        int balance = playerBalance.get(sessionId);
-        int bonusPrice = calculateBonusPrice(request.getBet(), request.getBonusType());
-
-        if (balance < bonusPrice) {
-            throw new IllegalStateException("Insufficient balance for bonus");
-        }
-
-        Symbol[][] grid = generateBonusGrid(request.getBonusType());
-        boolean isWin = checkWin(grid);
-        int winAmount = calculateBonusWin(grid, request.getBet(), request.getBonusType());
-
-        int newBalance = balance - bonusPrice + winAmount;
-        playerBalance.put(sessionId, newBalance);
-
-        GameResult result = new GameResult();
-        result.setGrid(grid);
-        result.setWinAmount(winAmount);
-        result.setNewBalance(newBalance);
-        result.setWinningGame(isWin);
-
-        return result;
-    }
-
     private int calculateBonusPrice(int bet, String bonusType) {
         return switch (bonusType) {
             case "neon-rush" -> bet * 50;
@@ -105,13 +155,10 @@ public class GameService {
     }
 
     private Symbol[][] generateBonusGrid(String bonusType) {
-        // Реалізуйте логіку генерації символів з підвищеними шансами
-        // відповідно до типу бонусу
-        return generateGrid(); // Тимчасово використовуємо звичайну генерацію
+        return generateGrid();
     }
 
     private int calculateBonusWin(Symbol[][] grid, int bet, String bonusType) {
-        // Реалізуйте розрахунок виграшу з урахуванням бонусних правил
         return calculateWin(grid, bet);
     }
 }
