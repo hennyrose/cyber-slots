@@ -1,11 +1,15 @@
 version: 1.0
 runtime: docker
+
 build:
   commands:
     build:
-      - docker build -t app .
+
+      - docker build --build-arg PROD_API_URL=$PROD_API_URL -t app -f Dockerfile .
+
 run:
-  command: docker run -p 8080:8080 app
+  command: docker run -p 8080:8080 -e PROD_API_URL=$PROD_API_URL app
+
   network:
     port: 8080
     healthCheck:
