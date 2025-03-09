@@ -41,7 +41,8 @@ WORKDIR /app
 COPY --from=build-backend /app/target/*.jar app.jar
 
 # Add health check
-HEALTHCHECK --interval=30s --timeout=3s \
+# In your final stage, after COPY command:
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 EXPOSE 8080

@@ -1,18 +1,22 @@
 version: 1.0
 runtime: java
-runtime-version: corretto21
 build:
   commands:
-    pre-build:
-      - cd cyber-slots-frontend
-      - npm install
-      - npm run build
-      - cd ..
     build:
       - mvn clean package -DskipTests
   artifacts:
     - type: jar
-      location: target/*.jar
+      name: application
+      path: target/*.jar
 run:
+  runtime-version: corretto21
   command: java -jar target/*.jar
-  port: 8080
+  network:
+    port: 8080
+  env:
+    - name: REDIS_HOST
+      value: "redis-15672.c300.eu-central-1-1.ec2.redns.redis-cloud.com"
+    - name: REDIS_PORT
+      value: "15672"
+    - name: REDIS_PASSWORD
+      value: "mk4kJBDV6UQ6AFU6LAw2RGJ2pRUMqAmR"
