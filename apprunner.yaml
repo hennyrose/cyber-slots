@@ -1,12 +1,18 @@
 version: 1.0
-runtime: docker
-
+runtime: java
+runtime-version: corretto21
 build:
-  command: |
-    docker build -t app .
-
+  commands:
+    pre-build:
+      - cd cyber-slots-frontend
+      - npm install
+      - npm run build
+      - cd ..
+    build:
+      - mvn clean package -DskipTests
+  artifacts:
+    - type: jar
+      location: target/*.jar
 run:
-  runtime-version: 1.0
-  command: docker run -p 8080:8080 app
-  ports:
-    - 8080
+  command: java -jar target/*.jar
+  port: 8080
