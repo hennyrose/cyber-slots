@@ -1,15 +1,12 @@
 version: 1.0
-runtime: nodejs18
+runtime: docker
+
 build:
-  commands:
-    build:
-      - cd cyber-slots-frontend
-      - npm install
-      - npm run build
-      - cd ..
-      - mvn clean package -DskipTests
+  command: |
+    docker build -t app .
+
 run:
-  runtime-version: corretto21
-  command: java -jar target/*.jar
-  network:
-    port: 8080
+  runtime-version: 1.0
+  command: docker run -p 8080:8080 app
+  ports:
+    - 8080
