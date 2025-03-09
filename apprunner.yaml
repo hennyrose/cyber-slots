@@ -13,6 +13,12 @@ run:
   command: java -jar target/*.jar
   network:
     port: 8080
+    healthCheck:
+      path: /actuator/health
+      interval: 10
+      timeout: 5
+      healthyThreshold: 2
+      unhealthyThreshold: 3
   env:
     - name: REDIS_HOST
       value: "redis-15672.c300.eu-central-1-1.ec2.redns.redis-cloud.com"
