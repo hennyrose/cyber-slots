@@ -1,16 +1,14 @@
 version: 1.0
 runtime: docker
 
-# Використовуємо існуючий Dockerfile
 build:
   command: |
-    docker build -t cyber-slots-app .
+    docker build -t application .
 
 run:
-  runtime-version: 21
-  # Використовуємо порт 8080, як вказано в Dockerfile
-  port: 8080
-
+  command: docker run -p 8080:8080 application
+  network:
+    port: 8080
   env:
     - name: REDIS_HOST
       value: "${REDIS_HOST}"
@@ -24,10 +22,3 @@ run:
 instance:
   cpu: 1
   memory: 2048
-
-health_check:
-  path: /actuator/health
-  interval: 10
-  timeout: 5
-  healthy_threshold: 2
-  unhealthy_threshold: 3
