@@ -1,16 +1,12 @@
 version: 1.0
-runtime: java
+runtime: docker
 build:
   commands:
     build:
-      - mvn clean package -DskipTests
-  artifacts:
-    - type: jar
-      name: application
-      path: target/*.jar
+      - docker build -t app .
 run:
-  runtime-version: corretto21
-  command: java -jar target/*.jar
+  runtime-version: 1.0.0
+  command: docker run -p 8080:8080 app
   network:
     port: 8080
     healthCheck:
@@ -19,10 +15,3 @@ run:
       timeout: 5
       healthyThreshold: 2
       unhealthyThreshold: 3
-  env:
-    - name: REDIS_HOST
-      value: "redis-15672.c300.eu-central-1-1.ec2.redns.redis-cloud.com"
-    - name: REDIS_PORT
-      value: "15672"
-    - name: REDIS_PASSWORD
-      value: "mk4kJBDV6UQ6AFU6LAw2RGJ2pRUMqAmR"
