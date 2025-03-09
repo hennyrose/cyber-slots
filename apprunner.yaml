@@ -1,24 +1,15 @@
 version: 1.0
-runtime: docker
-
+runtime: nodejs18
 build:
-  command: |
-    docker build -t application .
-
+  commands:
+    build:
+      - cd cyber-slots-frontend
+      - npm install
+      - npm run build
+      - cd ..
+      - mvn clean package -DskipTests
 run:
-  command: docker run -p 8080:8080 application
+  runtime-version: corretto21
+  command: java -jar target/*.jar
   network:
     port: 8080
-  env:
-    - name: REDIS_HOST
-      value: "${REDIS_HOST}"
-    - name: REDIS_PORT
-      value: "${REDIS_PORT}"
-    - name: REDIS_PASSWORD
-      value: "${REDIS_PASSWORD}"
-    - name: SPRING_PROFILES_ACTIVE
-      value: "prod"
-
-instance:
-  cpu: 1
-  memory: 2048
