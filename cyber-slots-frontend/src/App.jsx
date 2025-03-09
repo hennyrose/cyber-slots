@@ -134,7 +134,7 @@ function App() {
 
     const fetchBalance = async () => {
         try {
-            const response = await fetch('https://cyber-slots.onrender.com/api/game/balance', {
+            const response = await fetch('https://2s3xdpykew.eu-central-1.awsapprunner.com/api/game/balance', {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to fetch balance');
@@ -157,7 +157,7 @@ function App() {
         setBalanceChange(-bet);
 
         try {
-            const response = await fetch('https://cyber-slots.onrender.com/api/game/spin', {
+            const response = await fetch('https://2s3xdpykew.eu-central-1.awsapprunner.com/api/game/spin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ function App() {
         setError(null);
 
         try {
-            const response = await fetch('https://cyber-slots.onrender.com/api/game/bonus-spin', {
+            const response = await fetch('https://2s3xdpykew.eu-central-1.awsapprunner.com/api/game/bonus-spin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ function App() {
 
     const handleRestart = async () => {
         try {
-            const response = await fetch('https://cyber-slots.onrender.com/api/game/restart', {
+            const response = await fetch('https://2s3xdpykew.eu-central-1.awsapprunner.com/api/game/restart', {
                 method: 'POST',
                 credentials: 'include'
             });
