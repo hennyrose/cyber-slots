@@ -38,9 +38,11 @@ RUN mvn clean package -DskipTests
 # ------------------------------------------
 FROM amazoncorretto:21-alpine
 WORKDIR /app
+COPY --from=build-backend /app/target/*.jar app.jar
 
-# Копируем собранный jar
-COPY --from=build-backend /app/target/*.jar cyber-application.jar
+# Add health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "cyber-application.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

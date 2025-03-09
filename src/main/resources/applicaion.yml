@@ -1,0 +1,21 @@
+spring:
+  session:
+    store-type: redis
+    timeout: 30m
+    redis:
+      namespace: cyber-slots:session
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+
+server:
+  port: 8080

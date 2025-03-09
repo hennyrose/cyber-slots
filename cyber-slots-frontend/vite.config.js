@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://2s3xdpykew.eu-central-1.awsapprunner.com',
+        target: process.env.PROD_API_URL || 'http://localhost:8080',
         changeOrigin: true,
         secure: false
       }
